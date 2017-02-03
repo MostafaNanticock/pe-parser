@@ -10,7 +10,8 @@ information in Windows executables.
 `pe.cpp` and `pe.hpp` contain the functionality for parsing PE files into
 separate (memory) sections, and writing them back:
 
- - `read_pe_file` turns a file name or `FILE *` into a `PE::PortableExecutable`.
+ - `read_pe_file` turns a file name or `FILE *` into a `PE::PortableExecutable`
+   containing an `std::vector` of `Section`s.
  - `write_pe_file` does the reverse.
 
 `pe-res.cpp` and `pe-res.hpp` contain the functionality for parsing and
