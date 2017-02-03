@@ -5,16 +5,15 @@
 
 namespace PE {
 
+struct Section {
+	std::string name;
+	uint32_t virtual_size;
+	uint32_t virtual_address;
+	uint32_t characteristics;
+	std::vector<unsigned char> data;
+};
+
 struct PortableExecutable {
-
-	struct Section {
-		std::string name;
-		uint32_t virtual_size;
-		uint32_t virtual_address;
-		uint32_t characteristics;
-		std::vector<unsigned char> data;
-	};
-
 	std::vector<unsigned char> headers;
 	std::vector<Section> sections;
 };
