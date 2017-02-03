@@ -1,6 +1,6 @@
 # pe-parser
 
-Cross-platform C++14 portable executable parser and (re-)serializer.
+Portable executable parser and (re-)serializer.
 
 This library can be used to extract and change resources and version
 information in Windows executables.
