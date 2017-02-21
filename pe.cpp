@@ -114,9 +114,54 @@ PortableExecutable read_pe_file(FILE * f) try {
 	throw std::runtime_error("Unable to parse PE file. (Error " + std::to_string(error) + ")");
 }
 
-void write_pe_file(FILE * f, PortableExecutable const & pe) {
-	// TODO: correct image/file size headers
-	write_data(f, pe.headers.data(), pe.headers.size());
+void write_pe_file(FILE * f, PortableExecutable const & pe) try {
+	auto headers = pe.headers;
+
+	if (headers.size() < 0x40) throw 500;
+
+	uint32_t pe_header_offset =
+		headers[0x3C] | headers[0x3D] << 8 | headers[0x3E] << 16 | headers[0x3F] << 24;
+
+	if (headers.size() < pe_header_offset + 0x70) throw 501;
+
+	size_t image_size = 0;
+	for (auto & section : pe.sections) {
+		size_t m = section.virtual_address + section.virtual_size;
+		if (m > image_size) image_size = m;
+		int offset = -1;
+		if (section.name == ".rsrc") {
+			offset = pe_header_offset + 0x88 + 4;
+		} // TODO: other sections.
+		if (offset != -1) {
+			if (headers.size() >= offset + 4) {
+				headers[offset    ] = section.virtual_size       & 0xFF;
+				headers[offset + 1] = section.virtual_size >>  8 & 0xFF;
+				headers[offset + 2] = section.virtual_size >> 16 & 0xFF;
+				headers[offset + 3] = section.virtual_size >> 24 & 0xFF;
+				printf("rsrc virtual size: %08X\n", section.virtual_size);
+			}
+		}
+	}
+
+	uint32_t alignment =
+		headers[pe_header_offset + 0x38]       |
+		headers[pe_header_offset + 0x39] <<  8 |
+		headers[pe_header_offset + 0x3a] << 16 |
+		headers[pe_header_offset + 0x3b] << 24;
+
+	printf("Alignment: %08x\n", alignment);
+
+	image_size = ((image_size + alignment - 1) / alignment) * alignment;
+
+	printf("New image size: %08x\n", int32_t(image_size));
+
+	headers[pe_header_offset + 0x50] = image_size       & 0xFF;
+	headers[pe_header_offset + 0x51] = image_size >>  8 & 0xFF;
+	headers[pe_header_offset + 0x52] = image_size >> 16 & 0xFF;
+	headers[pe_header_offset + 0x53] = image_size >> 24 & 0xFF;
+
+
+	write_data(f, headers.data(), headers.size());
 
 	size_t section_table_size = 40 * pe.sections.size();
 
@@ -156,6 +201,9 @@ void write_pe_file(FILE * f, PortableExecutable const & pe) {
 		if (p) write_data(f, std::vector<unsigned char>(p).data(), p);
 		section_data_offset += section.data.size() + p;
 	}
+
+} catch (int error) {
+	throw std::runtime_error("Unable to write PE file. (Error " + std::to_string(error) + ")");
 }
 
 PortableExecutable read_pe_file(char const * file_name) {
