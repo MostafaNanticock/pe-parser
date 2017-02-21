@@ -21,13 +21,13 @@ uint32_t read_uint32(FILE * f, int error) {
 	unsigned char buf[4];
 	read_data(f, buf, 4, error);
 	return buf[0] | buf[1] << 8 | buf[2] << 16 | buf[3] << 24;
-};
+}
 
 uint16_t read_uint16(FILE * f, int error) {
 	unsigned char buf[2];
 	read_data(f, buf, 2, error);
 	return buf[0] | buf[1] << 8;
-};
+}
 
 void write_data(FILE * f, unsigned char const * buf, size_t n_bytes) {
 	if (fwrite(buf, n_bytes, 1, f) != 1) throw std::runtime_error("Unable to write to file.");
