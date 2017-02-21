@@ -27,12 +27,12 @@ mstd::range<unsigned char const> read_data(mstd::range<unsigned char const> & da
 uint32_t read_uint32(mstd::range<unsigned char const> & data, int error) {
 	auto buf = read_data(data, 4, error);
 	return buf[0] | buf[1] << 8 | buf[2] << 16 | buf[3] << 24;
-};
+}
 
 uint32_t read_uint16(mstd::range<unsigned char const> & data, int error) {
 	auto buf = read_data(data, 2, error);
 	return buf[0] | buf[1] << 8;
-};
+}
 
 void write_uint16(unsigned char * data, uint16_t value) {
 	data[0] = value      & 0xFF;
