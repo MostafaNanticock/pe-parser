@@ -138,7 +138,6 @@ void write_pe_file(FILE * f, PortableExecutable const & pe) try {
 				headers[offset + 1] = section.virtual_size >>  8 & 0xFF;
 				headers[offset + 2] = section.virtual_size >> 16 & 0xFF;
 				headers[offset + 3] = section.virtual_size >> 24 & 0xFF;
-				printf("rsrc virtual size: %08X\n", section.virtual_size);
 			}
 		}
 	}
@@ -149,11 +148,7 @@ void write_pe_file(FILE * f, PortableExecutable const & pe) try {
 		headers[pe_header_offset + 0x3a] << 16 |
 		headers[pe_header_offset + 0x3b] << 24;
 
-	printf("Alignment: %08x\n", alignment);
-
 	image_size = ((image_size + alignment - 1) / alignment) * alignment;
-
-	printf("New image size: %08x\n", int32_t(image_size));
 
 	headers[pe_header_offset + 0x50] = image_size       & 0xFF;
 	headers[pe_header_offset + 0x51] = image_size >>  8 & 0xFF;
